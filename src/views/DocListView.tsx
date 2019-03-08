@@ -3,6 +3,7 @@ import * as store from '../store';
 import { IDoc } from '../store/Doc';
 import { Icon } from 'antd';
 import DocListItem from '../components/DocListItem';
+import InlineEditor from '../components/InlineEditor';
 
 interface IProp extends React.Props<any> {
 
@@ -44,8 +45,14 @@ export default class DocListView extends React.Component<IProp, IState> {
         if (!this.state.ready) {
             return <Icon type="loading" />;
         }
+        const onOk = () => {
+            return new Promise<void>((resolve) => {
+                setTimeout(resolve, 3000);
+            })
+        }
         return (<div>
             {this.state.list.map(doc => <DocListItem data={doc} />)}
+            <InlineEditor onOk={onOk} placeholder="Please input..." />
         </div>);
 
     }

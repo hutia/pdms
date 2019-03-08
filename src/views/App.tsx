@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as store from '../store';
 import { IDoc } from '../store/Doc';
+import DocListView from './DocListView';
 
 interface IProp extends React.Props<any> {
 
@@ -25,8 +26,6 @@ export class App extends React.Component<IProp, IState> {
   }
 
   render() {
-    return <div>Hello PDMS
-      {this.state.list.map(doc => <div>{doc.name}</div>)}
-    </div>;
+    return <DocListView />;
   }
 }

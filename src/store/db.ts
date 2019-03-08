@@ -2,7 +2,6 @@ import * as Datastore from 'nedb';
 import { nedbConfig } from '../config';
 
 const db = new Datastore(Object.assign({ autoload: true }, nedbConfig));
-console.log(db);
 
 export function insert(d: any): Promise<any> {
     return new Promise((resolve, reject) => {
