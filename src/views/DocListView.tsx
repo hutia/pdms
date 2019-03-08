@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Breadcrumb } from 'antd';
-import { IDoc } from '../store/Doc';
 import * as store from '../store';
+import { IDoc } from '../store/Doc';
+import { Icon } from 'antd';
+import DocListItem from '../components/DocListItem';
 
 interface IProp extends React.Props<any> {
 
@@ -12,7 +13,7 @@ interface IState extends React.ComponentState {
     list: IDoc[];
 }
 
-export default class MyBreadcrumb extends React.Component<IProp, IState> {
+export default class DocListView extends React.Component<IProp, IState> {
     constructor(props: IProp) {
         super(props);
         this.state = {
@@ -20,8 +21,11 @@ export default class MyBreadcrumb extends React.Component<IProp, IState> {
             list: [],
         };
         this.refresh = this.refresh.bind(this);
-        store.watchCurrentId(this.refresh);
+    }
+
+    componentDidMount() {
         this.refresh();
+        store.watchCurrentId(this.refresh);
     }
 
     componentWillUnmount() {
@@ -38,21 +42,11 @@ export default class MyBreadcrumb extends React.Component<IProp, IState> {
 
     render() {
         if (!this.state.ready) {
-            return <Breadcrumb>Loading...</Breadcrumb>;
+            return <Icon type="loading" />;
         }
-        const click = (d?: IDoc) => () => store.setCurrentId(d ? d.__id : '');
-        const Item = (d?: IDoc) => (<Breadcrumb.Item key={d ? d.__id : 'root'}>
-            <a href="javascript:void(0);" onClick={click(d)}>
-                {d ? d.name : 'Root'}
-            </a>
-        </Breadcrumb.Item>);
-        const list = this.state.list.slice();
-        const lastItem = list.pop();
-        return (<Breadcrumb>
-            {Item()}
-            {list.map(Item)}
-            {lastItem && Item(lastItem)}
-        </Breadcrumb>);
+        return (<div>
+            {this.state.list.map(doc => <DocListItem data={doc} />)}
+        </div>);
 
     }
 }
