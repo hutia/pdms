@@ -2,15 +2,19 @@ import { IDoc } from './Doc';
 import * as db from './db';
 import * as state from './state';
 
+const CURRENT_ID = 'currentId';
+
 export function getDocById(id: string): Promise<IDoc | null> {
     return db.findOne<IDoc>({ __id: id });
 }
 
-export function children(d: IDoc): Promise<IDoc[]> {
-    if (d.link && d.link.type === 'doc') {
+export function children(d?: IDoc): Promise<IDoc[]> {
+    if (d && d.link && d.link.type === 'doc') {
         return db.find<IDoc>({ parentId: d.link.href });
-    } else {
+    } else if (d) {
         return db.find<IDoc>({ parentId: d.__id });
+    } else {
+        return db.find<IDoc>({ parentId: '' });
     }
 }
 
@@ -47,11 +51,11 @@ export async function removeDoc(d: IDoc): Promise<void> {
 }
 
 export function setCurrentId(id: string) {
-    state.set('currentId', id);
+    state.set(CURRENT_ID, id);
 }
 
 export function getCurrentId(): string | undefined {
-    return state.get('currentId');
+    return state.get(CURRENT_ID);
 }
 
 export function getCurrentDoc(): Promise<IDoc | null> {
@@ -61,9 +65,15 @@ export function getCurrentDoc(): Promise<IDoc | null> {
 }
 
 export function watchCurrentId(fn: () => void) {
-    state.watch('currentId', fn);
+    state.watch(CURRENT_ID, fn);
 }
 
 export function unwatchCurrentId(fn: () => void) {
-    state.unwatch('currentId', fn);
+    state.unwatch(CURRENT_ID, fn);
+}
+
+export async function createDocUnderCurrent(name: string) {
+    const doc = await insertDoc({ name, parentId: getCurrentId() || '' });
+    state.emit(CURRENT_ID);
+    return doc;
 }

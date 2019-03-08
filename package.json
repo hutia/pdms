@@ -1,6 +1,6 @@
 {
   "name": "pdms",
-  "productName": "pdms",
+  "productName": "PDMS",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "src/index.ts",
@@ -52,20 +52,21 @@
   },
   "dependencies": {
     "@types/electron-devtools-installer": "^2.0.2",
-    "@types/react": "^0.14.55",
-    "@types/react-dom": "^0.14.20",
     "antd": "^3.15.0",
     "electron-compile": "^6.4.4",
     "electron-devtools-installer": "^2.1.0",
     "electron-squirrel-startup": "^1.0.0",
     "nedb": "^1.8.0",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
     "react-hot-loader": "^3.0.0-beta.6",
     "tslib": "^1.4.0"
   },
   "devDependencies": {
     "@types/nedb": "^1.8.7",
+    "@types/react": "^16.8.7",
+    "@types/react-dom": "^16.8.2",
+    "@types/react-hot-loader": "^4.1.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",

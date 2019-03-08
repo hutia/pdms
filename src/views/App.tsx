@@ -1,17 +1,16 @@
-import React, { Component } from 'react';
-import '../theme/App.css';
-import * as fs from 'fs';
-import EditableText from '../components/EditableText';
+import * as React from 'react';
+import * as store from '../store';
+import { IDoc } from '../store/Doc';
 
 interface IProp extends React.Props<any> {
 
 }
 
 interface IState extends React.ComponentState {
-  list: string[];
+  list: IDoc[];
 }
 
-class App extends Component<IProp, IState> {
+export class App extends React.Component<IProp, IState> {
   constructor(props: IProp) {
     super(props);
     this.state = {
@@ -19,19 +18,15 @@ class App extends Component<IProp, IState> {
     };
   }
 
-  componentDidMount() {
-    let list = fs.readdirSync('d:/hutia/code');
+  async componentDidMount() {
+    store.createDocUnderCurrent('test - ' + Math.random());
+    const list = await store.children();
     this.setState({ list });
   }
 
   render() {
-    const list = this.state.list.slice();
-    const change = (index: number) => async (v: string) => {
-      list[index] = v;
-      this.setState({ list });
-    };
-    return list.map((f, index) => <EditableText key={index} text={f} onChange={change(index)} />);
+    return <div>Hello PDMS
+      {this.state.list.map(doc => <div>{doc.name}</div>)}
+    </div>;
   }
 }
-
-export default App;

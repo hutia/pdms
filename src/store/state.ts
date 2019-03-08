@@ -22,3 +22,6 @@ export function unwatch(name: string, fn: () => void) {
     evt.off(name, fn);
 }
 
+export function emit(name: string) {
+    evt.emit(name);
+}
