@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Input, Button, Icon } from 'antd';
 import { InputProps } from 'antd/lib/input';
+import { bindThis } from '../utils';
 
 interface IProp extends InputProps {
-    onOk: (value: string) => Promise<void>;
+    onOk: (value: string) => Promise<any>;
     onCancel?: () => void;
 }
 
@@ -19,9 +20,8 @@ export default class InlineEditor extends React.Component<IProp, IState> {
         super(props);
         this.state = {
         };
-        this.onKeyDown = this.onKeyDown.bind(this);
-        this.submit = this.submit.bind(this);
-        this.cancel = this.cancel.bind(this);
+        bindThis(this, 'onKeyDown', 'submit', 'cancel');
+
     }
 
     onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {

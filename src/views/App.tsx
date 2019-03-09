@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as store from '../store';
 import { IDoc } from '../store/Doc';
 import DocListView from './DocListView';
+import DocPath from './DocPath';
 
 interface IProp extends React.Props<any> {
 
@@ -20,12 +21,14 @@ export class App extends React.Component<IProp, IState> {
   }
 
   async componentDidMount() {
-    store.createDocUnderCurrent('test - ' + Math.random());
     const list = await store.children();
     this.setState({ list });
   }
 
   render() {
-    return <DocListView />;
+    return (<div>
+      <DocPath />
+      <DocListView />
+    </div>);
   }
 }

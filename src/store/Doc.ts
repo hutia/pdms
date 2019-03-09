@@ -2,7 +2,7 @@
 export type LinkType = 'fs-file' | 'fs-folder' | 'doc' | 'url';
 
 export interface IDoc {
-    __id: string;
+    _id: string;
     name: string;
 
     content?: string;
