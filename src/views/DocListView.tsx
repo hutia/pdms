@@ -45,6 +45,20 @@ export default class DocListView extends React.Component<IProp, IState> {
         });
     }
 
+    activeDocs() {
+        const { activeDocIds, list } = this.state;
+        return list.filter(d => activeDocIds.has(d._id));
+    }
+
+    async removeDoc() {
+        const docs = this.activeDocs();
+        const docNames = docs.slice(0, 5).map(d => '\t' + d.name).join('\r\n') + (docs.length > 5 ? '\r\n......' : '');
+        const [confirmed] = await confirm({ message: `确实要删除选定的 ${docs.length} 个项目吗？\r\n${docNames}` });
+        if (confirmed !== 0) { return; }
+        await store.removeDocs(docs);
+        this.refresh();
+    }
+
     render() {
         // if (!this.state.ready) {
         //     return <Icon type="loading" />;
@@ -88,23 +102,18 @@ export default class DocListView extends React.Component<IProp, IState> {
 
         const navDoc = (d: IDoc) => store.setCurrentId(d._id);
 
-        const removeDoc = async () => {
-            const docs = list.filter(d => activeDocIds.has(d._id));
-            const docNames = docs.slice(0, 5).map(d => '\t' + d.name).join('\r\n') + (docs.length > 5 ? '\r\n......' : '');
-            const [confirmed] = await confirm({ message: `确实要删除选定的 ${docs.length} 个项目吗？\r\n${docNames}`});
-            if (confirmed !== 0) { return; }
-            await store.removeDocs(docs);
-            this.refresh();
-        }
+        const onKeyDown = (e: React.KeyboardEvent) => {
+            e.key === 'Delete' && this.removeDoc();
+            e.key === 'Backspace' && store.navUp();
+        };
 
-        return (<div>
+        return (<div onKeyDown={onKeyDown}>
             <List
                 itemLayout="horizontal"
                 dataSource={list}
                 renderItem={(doc: IDoc) => (<DocListItem
                     onSelect={selectDoc}
                     onDoubleClick={navDoc}
-                    onRemove={removeDoc}
                     data={doc}
                     active={activeDocIds.has(doc._id)}
                 />)}

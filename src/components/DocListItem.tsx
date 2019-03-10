@@ -8,7 +8,6 @@ interface IProp extends React.Props<any> {
     active?: any;
     onSelect?: (d: IDoc, ctrlKey?: boolean, shift?: boolean) => void;
     onDoubleClick?: (d: IDoc) => void;
-    onRemove?: () => void;
 }
 
 interface IState extends React.ComponentState {
@@ -59,16 +58,8 @@ export default class DocListItem extends React.Component<IProp, IState> {
         const onClick = (e: React.MouseEvent) => this.props.onSelect && this.props.onSelect(data, e.ctrlKey, e.shiftKey);
         const onDoubleClick = () => this.props.onDoubleClick && this.props.onDoubleClick(data);
         const onKeyDown = (e: React.KeyboardEvent) => {
-            e.key === 'Delete' && this.props.onRemove && this.props.onRemove();
+            e.key === 'Enter' && this.props.onDoubleClick && this.props.onDoubleClick(data);
         }
-
-        // const actions = [];
-
-        // if (this.props.onRemove) {
-        //     actions.push(<Popconfirm title="确认要删除吗？" onConfirm={doRemove} okText="删除" cancelText="取消">
-        //         <a href="#">删除</a>
-        //     </Popconfirm>);
-        // }
 
         return (
             <List.Item
@@ -81,7 +72,10 @@ export default class DocListItem extends React.Component<IProp, IState> {
                 style={style(hover, active)}
                 tabIndex={0}
             >
-                <List.Item.Meta title={data.name} />
+                <List.Item.Meta
+                    title={data.name}
+                    description={data.description || ''}
+                />
             </List.Item>
         );
     }

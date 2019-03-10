@@ -79,6 +79,13 @@ export async function getCurrentChildren(): Promise<IDoc[]> {
     }
 }
 
+export async function navUp() {
+    const cur = await getCurrentDoc();
+    if (cur) {
+        setCurrentId(cur.parentId || '');
+    }
+}
+
 export function watchCurrentId(fn: () => void) {
     state.watch(CURRENT_ID, fn);
 }
