@@ -1,11 +1,15 @@
 import * as React from 'react';
 import { Breadcrumb, Icon } from 'antd';
+import * as api from '../api';
 import { IDoc } from '../store/Doc';
 import * as store from '../store';
 import { bindThis } from '../utils';
+import * as status from '../utils/status';
+
+const { CURRENT_ID } = status.STATUS;
 
 interface IProp extends React.Props<any> {
-
+    style: React.CSSProperties;
 }
 
 interface IState extends React.ComponentState {
@@ -14,7 +18,7 @@ interface IState extends React.ComponentState {
 }
 
 function clickFactory(d?: IDoc) {
-    return () => store.setCurrentId(d ? d._id : '');
+    return () => api.navDoc(d);
 }
 
 function itemFactory(doc?: IDoc, isLast?: boolean) {
@@ -52,17 +56,17 @@ export default class DocPath extends React.Component<IProp, IState> {
     }
 
     componentDidMount() {
-        store.watchCurrentId(this.refresh);
+        status.watch(CURRENT_ID, this.refresh);
         this.refresh();
     }
 
     componentWillUnmount() {
-        store.unwatchCurrentId(this.refresh);
+        status.unwatch(CURRENT_ID, this.refresh);
     }
 
     refresh() {
         this.setState({ ready: false }, async () => {
-            const currentDoc = await store.getCurrentDoc();
+            const currentDoc = await api.getCurrentDoc();
             const list = currentDoc ? (await store.parents(currentDoc)) : [];
             this.setState({ ready: true, list: list.reverse() });
         });
@@ -78,7 +82,7 @@ export default class DocPath extends React.Component<IProp, IState> {
             </Breadcrumb>);
         }
         const { list } = this.state;
-        return (<Breadcrumb>
+        return (<Breadcrumb {...this.props}>
             {itemFactory(undefined, list.length === 0)}
             {list.map((doc, index) => itemFactory(doc, index === list.length - 1))}
         </Breadcrumb>);

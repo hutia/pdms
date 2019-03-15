@@ -6,7 +6,7 @@ import { List } from 'antd';
 interface IProp extends React.Props<any> {
     data: IDoc;
     active?: any;
-    onSelect?: (d: IDoc, ctrlKey?: boolean, shift?: boolean) => void;
+    onSelect?: (d: IDoc, ctrlKey?: boolean, shiftKey?: boolean) => void;
     onDoubleClick?: (d: IDoc) => void;
 }
 
@@ -16,9 +16,9 @@ interface IState extends React.ComponentState {
 
 const styles: { [key: string]: React.CSSProperties } = {
     'default': {
-        'backgroundColor': 'white',
         'cursor': 'pointer',
         'userSelect': 'none',
+        padding: '10px 30px',
     },
     'hover': {
         'backgroundColor': '#EEE',
@@ -38,7 +38,7 @@ function style(hover: boolean, active: boolean): React.CSSProperties {
     let styleName = 'default';
     if (active) { styleName = hover ? 'active-hover' : 'active'; }
     else { styleName = hover ? 'hover' : 'default'; }
-    return styles[styleName]
+    return styles[styleName];
 }
 
 export default class DocListItem extends React.Component<IProp, IState> {

@@ -25,3 +25,8 @@ export function unwatch(name: string, fn: () => void) {
 export function emit(name: string) {
     evt.emit(name);
 }
+
+export const STATUS = {
+    CURRENT_ID: 'Current Id',
+    SELECTED_DOC_IDs: 'Selected Doc IDs',
+};

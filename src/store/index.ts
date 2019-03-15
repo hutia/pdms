@@ -1,13 +1,17 @@
 import { IDoc } from './Doc';
 import * as db from './db';
-import * as state from './state';
 
-const CURRENT_ID = 'currentId';
-
+/** 根据 id 获取指定的文档 */
 export function getDocById(id: string): Promise<IDoc | null> {
     return db.findOne<IDoc>({ _id: id });
 }
 
+/** 根据 id 获取指定的文档 */
+export function getDocsByIds(ids: string[]): Promise<IDoc[]> {
+    return db.find<IDoc>({ _id: { $in: ids } });
+}
+
+/** 获取文档的子节点数组 */
 export function children(d?: IDoc): Promise<IDoc[]> {
     if (d && d.link && d.link.type === 'doc') {
         return db.find<IDoc>({ parentId: d.link.href }, undefined, { sort: { name: 1 } });
@@ -18,6 +22,7 @@ export function children(d?: IDoc): Promise<IDoc[]> {
     }
 }
 
+/** 获取文档的父节点 */
 export function parent(d: IDoc): Promise<IDoc | null> {
     if (d.parentId) {
         return db.findOne<IDoc>({ _id: d.parentId });
@@ -26,6 +31,7 @@ export function parent(d: IDoc): Promise<IDoc | null> {
     }
 }
 
+/** 获取文档的祖先节点数组 */
 export async function parents(d: IDoc): Promise<IDoc[]> {
     const result: IDoc[] = [];
     const resultIdSet = new Set();
@@ -38,64 +44,26 @@ export async function parents(d: IDoc): Promise<IDoc[]> {
     return result;
 }
 
+/** 插入文档 */
 export function insertDoc(d: Partial<IDoc>): Promise<IDoc> {
     return db.insert(d);
 }
 
+/** 更新文档 */
 export async function updateDoc(d: IDoc): Promise<void> {
     await db.update({ _id: d._id }, d);
 }
 
+/** 删除文档，会优先遍历并删除其子节点 */
 export async function removeDoc(d: IDoc): Promise<void> {
     const children = await db.find<IDoc>({ parentId: d._id });
     await removeDocs(children);
     await db.remove({ _id: d._id });
 }
 
+/** 批量删除文档 */
 export async function removeDocs(list: IDoc[]): Promise<void[]> {
     return Promise.all(list.map(removeDoc))
 }
 
-export function setCurrentId(id: string) {
-    state.set(CURRENT_ID, id);
-}
 
-export function getCurrentId(): string | undefined {
-    return state.get(CURRENT_ID);
-}
-
-export function getCurrentDoc(): Promise<IDoc | null> {
-    const id = getCurrentId();
-    if (id) { return getDocById(id); }
-    else { return Promise.resolve(null); }
-}
-
-export async function getCurrentChildren(): Promise<IDoc[]> {
-    const cur = await getCurrentDoc();
-    if (cur) {
-        return children(cur);
-    } else {
-        return children();
-    }
-}
-
-export async function navUp() {
-    const cur = await getCurrentDoc();
-    if (cur) {
-        setCurrentId(cur.parentId || '');
-    }
-}
-
-export function watchCurrentId(fn: () => void) {
-    state.watch(CURRENT_ID, fn);
-}
-
-export function unwatchCurrentId(fn: () => void) {
-    state.unwatch(CURRENT_ID, fn);
-}
-
-export async function createDocUnderCurrent(name: string) {
-    const doc = await insertDoc({ name, parentId: getCurrentId() || '' });
-    state.emit(CURRENT_ID);
-    return doc;
-}
