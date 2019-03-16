@@ -30,7 +30,7 @@ const EditorForm = Form.create({ name: 'form_in_modal' })(
             const {
                 data, visible, onCancel, onOk, form,
             } = this.props;
-            const { getFieldDecorator } = form;
+            const { getFieldDecorator, getFieldValue } = form;
             return (
                 <Modal
                     visible={visible}
@@ -74,7 +74,42 @@ const EditorForm = Form.create({ name: 'form_in_modal' })(
                                 </Select.Option>)}
                             </Select>)}
                         </Form.Item>
+                        <Form.Item label="密码">
+                            {getFieldDecorator('password', {
+                                initialValue: data.password,
+                            })(<Input.Password />)}
+                        </Form.Item>
+                        <Form.Item label="重复密码">
+                            {getFieldDecorator('password2', {
+                                rules: [{
+                                    validator: (_, value, callback) => {
+                                        if (value !== getFieldValue('password')) {
+                                            callback('两次密码输入不一致！');
+                                        } else {
+                                            callback();
+                                        }
+                                    },
+                                }],
+                                initialValue: data.password,
+                            })(<Input.Password />)}
+                        </Form.Item>
+                        <Form.Item label="数据类型">
+                            {getFieldDecorator('contentType', {
+                                initialValue: data.contentType,
+                            })(<Select>
+                                <Select.Option value="text">文本</Select.Option>
+                                <Select.Option value="html">HTML</Select.Option>
+                                <Select.Option value="markdown">Mark Down</Select.Option>
+                                <Select.Option value="image">图像</Select.Option>
+                                <Select.Option value="local-file">文件</Select.Option>
+                                <Select.Option value="link-fs-file">链接 - 文件</Select.Option>
+                                <Select.Option value="link-fs-folder">链接 - 文件夹</Select.Option>
+                                <Select.Option value="link-doc">链接 - 项目</Select.Option>
+                                <Select.Option value="link-url">URL</Select.Option>
+                            </Select>)}
+                        </Form.Item>
                     </Form>
+
                 </Modal>
             );
         }
@@ -103,7 +138,9 @@ export default class DocEditor extends React.Component<IProp, IState> {
         form.validateFields((err, values) => {
             if (err) { return; }
             this.setState({ visible: false });
-            this.props.onOk(Object.assign({}, this.props.data, values));
+            const docLike = Object.assign({}, this.props.data, values);
+            delete docLike['password2'];
+            this.props.onOk(docLike);
         });
     }
 

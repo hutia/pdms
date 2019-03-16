@@ -7,7 +7,10 @@ import * as store from './store';
 import { IDoc } from './store/Doc';
 import { confirm } from './utils/dialog';
 import * as status from './utils/status';
+import * as enc from './utils/enc';
 import { showEditor } from './components/DocEditor';
+import { message } from 'antd';
+import { promptPassword } from './components/PromptPassword';
 
 const { CURRENT_ID, SELECTED_DOC_IDs } = status.STATUS;
 
@@ -137,10 +140,46 @@ export function unwatchSelect(fn: () => void) {
 export async function editSelectedDoc() {
     const d = await getLastSelectedDoc();
     if (!d) { return; }
+    if (d.password) {
+        const password = await promptPassword();
+        if (!password) { return; }
+        if (!validatePassword(d, password)) {
+            message.error('密码错误！');
+            return;
+        }
+        if (!unsealPassword(d, password)) {
+            message.error('解密失败！');
+            return;
+        }
+    }
     const nd = await showEditor(d);
     if (nd) {
+        sealPassword(nd);
         store.updateDoc(nd);
         status.emit(CURRENT_ID);
         status.emit(SELECTED_DOC_IDs);
     }
+}
+
+export function validatePassword(d: IDoc, password: string): boolean {
+    if (!d.password) { return true; }
+    return enc.validate(password, d.password || '');
+}
+
+export function sealPassword(d: IDoc) {
+    if (!d.password || !d.content) { return; }
+    d.content = enc.encode(d.content, d.password);
+    d.password = enc.encodePassword(d.password);
+}
+
+export function unsealPassword(d: IDoc, password: string): boolean {
+    if (!enc.validate(password, d.password || '') || !d.content) { return false; }
+    d.content = enc.decode(d.content, password);
+    d.password = password;
+    return true;
+}
+
+export function getDocContent(d: IDoc, password: string): string {
+    if (!enc.validate(password, d.password || '') || !d.content) { return ''; }
+    return enc.decode(d.content, password);
 }

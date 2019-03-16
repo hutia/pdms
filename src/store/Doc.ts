@@ -1,6 +1,5 @@
 
-export type LinkType = 'fs-file' | 'fs-folder' | 'doc' | 'url';
-export type ContentType = 'text' | 'html' | 'markdown' | 'image';
+export type ContentType = 'text' | 'html' | 'markdown' | 'image' | 'local-file' | 'link-fs-file' | 'link-fs-folder' | 'link-doc' | 'link-url';
 
 export interface IDoc {
     _id: string;
@@ -10,10 +9,6 @@ export interface IDoc {
     contentType?: ContentType;
     description?: string;
     icon?: string;
-    link?: {
-        type: LinkType,
-        href: string,
-    };
     parentId?: string;
     password?: string;
     tags?: string[];
