@@ -7,6 +7,7 @@ import * as store from './store';
 import { IDoc } from './store/Doc';
 import { confirm } from './utils/dialog';
 import * as status from './utils/status';
+import { showEditor } from './components/DocEditor';
 
 const { CURRENT_ID, SELECTED_DOC_IDs } = status.STATUS;
 
@@ -71,6 +72,17 @@ export function getSelectedDocIds(): Set<string> {
     return status.get(SELECTED_DOC_IDs) || new Set();
 }
 
+export function getLastSelectedDocId(): string | undefined {
+    const selectedDocIds = [...getSelectedDocIds()];
+    return selectedDocIds[selectedDocIds.length - 1];
+}
+
+export async function getLastSelectedDoc(): Promise<IDoc | null> {
+    const id = getLastSelectedDocId();
+    if (!id) { return null; }
+    return await store.getDocById(id);
+}
+
 export function selectDoc(d: IDoc, list?: IDoc[], options?: { shift?: boolean, ctrl?: boolean }): void {
     const ctrl = options && options.ctrl;
     const shift = options && options.shift;
@@ -84,8 +96,7 @@ export function selectDoc(d: IDoc, list?: IDoc[], options?: { shift?: boolean, c
             status.set(SELECTED_DOC_IDs, new Set([...selectedDocIds, d._id]));
         }
     } else if (shift && list) {
-        let lastDocId: string = '';
-        for (let id of selectedDocIds.values()) { lastDocId = id; }
+        const lastDocId = getLastSelectedDocId();
         if (!lastDocId) { return selectDoc(d); }
         const lastDocIndex = list.findIndex(doc => doc._id === lastDocId);
         const docIndex = list.findIndex(doc => doc._id === d._id);
@@ -97,6 +108,8 @@ export function selectDoc(d: IDoc, list?: IDoc[], options?: { shift?: boolean, c
                 Math.max(docIndex, lastDocIndex) + 1
             ).map(d => d._id),
         ]));
+    } else if (selectedDocIds.size === 1 && selectedDocIds.has(d._id)) {
+        // do nothing
     } else {
         status.set(SELECTED_DOC_IDs, new Set([d._id]));
     }
@@ -119,4 +132,15 @@ export function watchSelect(fn: () => void) {
 
 export function unwatchSelect(fn: () => void) {
     status.unwatch(SELECTED_DOC_IDs, fn);
+}
+
+export async function editSelectedDoc() {
+    const d = await getLastSelectedDoc();
+    if (!d) { return; }
+    const nd = await showEditor(d);
+    if (nd) {
+        store.updateDoc(nd);
+        status.emit(CURRENT_ID);
+        status.emit(SELECTED_DOC_IDs);
+    }
 }

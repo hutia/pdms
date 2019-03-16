@@ -55,8 +55,16 @@ export default class DocListItem extends React.Component<IProp, IState> {
         const { hover } = this.state;
         const onMouseOver = () => this.setState({ hover: true });
         const onMouseOut = () => this.setState({ hover: false });
-        const onClick = (e: React.MouseEvent) => this.props.onSelect && this.props.onSelect(data, e.ctrlKey, e.shiftKey);
-        const onDoubleClick = () => this.props.onDoubleClick && this.props.onDoubleClick(data);
+        const onClick = (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.props.onSelect && this.props.onSelect(data, e.ctrlKey, e.shiftKey);
+        };
+        const onDoubleClick = (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.props.onDoubleClick && this.props.onDoubleClick(data);
+        };
         const onKeyDown = (e: React.KeyboardEvent) => {
             e.key === 'Enter' && this.props.onDoubleClick && this.props.onDoubleClick(data);
         }
@@ -74,7 +82,6 @@ export default class DocListItem extends React.Component<IProp, IState> {
             >
                 <List.Item.Meta
                     title={data.name}
-                    description={data.description || ''}
                 />
             </List.Item>
         );

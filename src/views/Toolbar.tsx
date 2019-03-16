@@ -1,14 +1,13 @@
 import * as React from 'react';
 import * as api from '../api';
 import { Button } from 'antd';
-import { bindThis } from '../utils';
+import { bindDeferThis } from '../utils';
 
 interface IProp extends React.Props<any> {
 
 }
 
 interface IState extends React.ComponentState {
-    ready: boolean;
     selectedDocIds: Set<string>;
 }
 
@@ -19,7 +18,7 @@ export default class Toolbar extends React.Component<IProp, IState> {
             ready: false,
             selectedDocIds: new Set(),
         };
-        bindThis(this, 'refresh');
+        bindDeferThis(this, 'refresh');
     }
 
     componentDidMount() {
@@ -31,11 +30,9 @@ export default class Toolbar extends React.Component<IProp, IState> {
         api.unwatchSelect(this.refresh);
     }
 
-    refresh() {
-        this.setState({ ready: false }, async () => {
-            const selectedDocIds = api.getSelectedDocIds();
-            this.setState({ ready: true, selectedDocIds });
-        });
+    async refresh() {
+        const selectedDocIds = api.getSelectedDocIds();
+        this.setState({ selectedDocIds });
     }
 
     render() {
@@ -43,6 +40,7 @@ export default class Toolbar extends React.Component<IProp, IState> {
         return (<div onKeyDown={api.onKeyDown}>
             <Button icon="edit"
                 disabled={selectedDocIds.size !== 1}
+                onClick={api.editSelectedDoc}
             >
                 编辑
             </Button>

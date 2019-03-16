@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Breadcrumb, Icon } from 'antd';
+import { Breadcrumb } from 'antd';
 import * as api from '../api';
 import { IDoc } from '../store/Doc';
 import * as store from '../store';
-import { bindThis } from '../utils';
+import { bindDeferThis } from '../utils';
 import * as status from '../utils/status';
 
 const { CURRENT_ID } = status.STATUS;
@@ -13,7 +13,6 @@ interface IProp extends React.Props<any> {
 }
 
 interface IState extends React.ComponentState {
-    ready: boolean;
     list: IDoc[];
 }
 
@@ -49,10 +48,9 @@ export default class DocPath extends React.Component<IProp, IState> {
     constructor(props: IProp) {
         super(props);
         this.state = {
-            ready: false,
             list: [],
         };
-        bindThis(this, 'refresh');
+        bindDeferThis(this, 'refresh');
     }
 
     componentDidMount() {
@@ -64,23 +62,13 @@ export default class DocPath extends React.Component<IProp, IState> {
         status.unwatch(CURRENT_ID, this.refresh);
     }
 
-    refresh() {
-        this.setState({ ready: false }, async () => {
-            const currentDoc = await api.getCurrentDoc();
-            const list = currentDoc ? (await store.parents(currentDoc)) : [];
-            this.setState({ ready: true, list: list.reverse() });
-        });
+    async refresh() {
+        const currentDoc = await api.getCurrentDoc();
+        const list = currentDoc ? (await store.parents(currentDoc)) : [];
+        this.setState({ list: list.reverse() });
     }
 
     render() {
-        if (!this.state.ready) {
-            return (<Breadcrumb>
-                <Breadcrumb.Item>
-                    <Icon type="loading" />
-                    Loading...
-                </Breadcrumb.Item>
-            </Breadcrumb>);
-        }
         const { list } = this.state;
         return (<Breadcrumb {...this.props}>
             {itemFactory(undefined, list.length === 0)}

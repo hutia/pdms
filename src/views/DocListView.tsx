@@ -4,14 +4,13 @@ import { IDoc } from '../store/Doc';
 import { List } from 'antd';
 import DocListItem from '../components/DocListItem';
 import InlineEditor from '../components/InlineEditor';
-import { bindThis } from '../utils';
+import { bindDeferThis } from '../utils';
 
 interface IProp extends React.Props<any> {
 
 }
 
 interface IState extends React.ComponentState {
-    ready: boolean;
     list: IDoc[];
 }
 
@@ -19,10 +18,9 @@ export default class DocListView extends React.Component<IProp, IState> {
     constructor(props: IProp) {
         super(props);
         this.state = {
-            ready: false,
             list: [],
         };
-        bindThis(this, 'refresh');
+        bindDeferThis(this, 'refresh');
     }
 
     componentDidMount() {
@@ -34,11 +32,9 @@ export default class DocListView extends React.Component<IProp, IState> {
         api.unwatchCurrentId(this.refresh);
     }
 
-    refresh() {
-        this.setState({ ready: false }, async () => {
-            const list = await api.getCurrentChildren();
-            this.setState({ ready: true, list });
-        });
+    async refresh() {
+        const list = await api.getCurrentChildren();
+        this.setState({ list });
     }
 
     render() {

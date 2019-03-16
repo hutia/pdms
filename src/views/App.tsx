@@ -5,6 +5,7 @@ import DocListView from './DocListView';
 import DocPath from './DocPath';
 import Toolbar from './Toolbar';
 import { Layout } from 'antd';
+import DocDetailView from './DocDetailView';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -43,7 +44,7 @@ export class App extends React.Component<IProp, IState> {
         </Sider>
         <Layout>
           <Content style={{ margin: '0px 10px 0px 10px', backgroundColor: 'white' }}>
-            COntent
+            <DocDetailView />
           </Content>
           <Footer style={{ textAlign: 'center' }}>
             Ant Design ©2018 Created by Ant UED
