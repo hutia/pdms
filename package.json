@@ -9,6 +9,7 @@
     "url": "https://github.com/hutia/pdms.git"
   },
   "scripts": {
+    "renew-icon": "node ./src/icons/renewIcon.js",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",

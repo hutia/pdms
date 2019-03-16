@@ -1,14 +1,17 @@
 import * as React from 'react';
+import ICON from '../icons';
 import { Avatar } from 'antd';
-import { IDoc } from '../store/Doc';
+import { AvatarProps } from 'antd/lib/avatar';
 
-interface IProp extends React.Props<any> {
-    doc: IDoc;
+interface IProp extends AvatarProps {
+    type?: string;
 }
 
 export default function DocIcon(props: IProp) {
+    const { type, ...restProps } = props;
+    const src = './icons/' + (type && ICON[type] || 'file.png');
     return (
-        <Avatar src={props.doc.icon || 'defaultIcon'} />
+        <Avatar src={src} {...restProps} />
     );
 
 }

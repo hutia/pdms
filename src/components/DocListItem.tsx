@@ -2,6 +2,7 @@ import * as React from 'react';
 import { IDoc } from '../store/Doc';
 import { overwrite } from '../utils';
 import { List } from 'antd';
+import DocIcon from './DocIcon';
 
 interface IProp extends React.Props<any> {
     data: IDoc;
@@ -82,6 +83,7 @@ export default class DocListItem extends React.Component<IProp, IState> {
             >
                 <List.Item.Meta
                     title={data.name}
+                    avatar={<DocIcon type={data.icon}/>}
                 />
             </List.Item>
         );

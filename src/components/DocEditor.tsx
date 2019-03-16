@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IDoc } from '../store/Doc';
-import { Form, Modal, Input } from 'antd';
+import { ICON_NAMES } from '../icons';
+import { Form, Modal, Input, Select } from 'antd';
 import { bindThis } from '../utils';
 import { FormComponentProps } from 'antd/lib/form';
+import DocIcon from './DocIcon';
 
 interface IProp extends React.Props<any> {
     data: IDoc;
@@ -52,7 +54,25 @@ const EditorForm = Form.create({ name: 'form_in_modal' })(
                         <Form.Item label="描述">
                             {getFieldDecorator('description', {
                                 initialValue: data.description,
-                            })(<Input type="textarea" />)}
+                            })(<Input.TextArea autosize />)}
+                        </Form.Item>
+                        <Form.Item label="内容">
+                            {getFieldDecorator('content', {
+                                initialValue: data.content,
+                            })(<Input.TextArea autosize />)}
+                        </Form.Item>
+                        <Form.Item label="图标">
+                            {getFieldDecorator('icon', {
+                                initialValue: data.icon,
+                            })(<Select showSearch
+                                filterOption={true}
+                                placeholder="选择图标名称"
+                            >
+                                {ICON_NAMES.map(name => <Select.Option key={name} value={name}>
+                                    <DocIcon type={name} size="small" style={{ marginRight: '8px' }} />
+                                    {name}
+                                </Select.Option>)}
+                            </Select>)}
                         </Form.Item>
                     </Form>
                 </Modal>

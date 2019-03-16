@@ -3,6 +3,7 @@ import * as api from '../api';
 import { IDoc } from '../store/Doc';
 import { PageHeader, Typography, Tag } from 'antd';
 import { bindDeferThis } from '../utils';
+import DocIcon from '../components/DocIcon';
 
 const { Paragraph } = Typography;
 
@@ -50,12 +51,12 @@ export default class DocDetailView extends React.Component<IProp, IState> {
 
         return (<div>
             <PageHeader
-                title={data.name}
+                title={<span><DocIcon type={data.icon} size="small" style={{ marginRight: '10px' }} />{data.name}</span>}
                 subTitle={data.description}
                 onBack={api.navUp}
                 tags={data.tags && data.tags.map<Tag>(name => <Tag>{name}</Tag> as any) || undefined}
             />
-            <Paragraph>
+            <Paragraph style={{ margin: '10px 50px' }}>
                 {data.content}
             </Paragraph>
         </div>);
