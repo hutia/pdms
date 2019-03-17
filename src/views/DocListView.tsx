@@ -34,6 +34,10 @@ export default class DocListView extends React.Component<IProp, IState> {
 
     async refresh() {
         const list = await api.getCurrentChildren();
+        const selected = api.getSelectedDocIds();
+        if (list.length > 0 && !list.some(doc => selected.has(doc._id))) {
+            api.selectDoc(list[0]);
+        }
         this.setState({ list });
     }
 
@@ -58,7 +62,7 @@ export default class DocListView extends React.Component<IProp, IState> {
                 />)}
             >
             </List>
-            <InlineEditor onOk={api.createDocUnderCurrent} placeholder="Please input..." />
+            <InlineEditor onOk={api.createDocUnderCurrent} placeholder="快速添加..." />
         </div>);
 
     }

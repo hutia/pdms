@@ -72,7 +72,6 @@ export default class DocListItem extends React.Component<IProp, IState> {
 
         return (
             <List.Item
-                // actions={actions}
                 onMouseOver={onMouseOver}
                 onMouseOut={onMouseOut}
                 onClick={onClick}

@@ -86,15 +86,12 @@ export default class DocDetailView extends React.Component<IProp, IState> {
     }
 
     componentWillUnmount() {
-        api.watchCurrentId(this.refresh);
-        api.watchSelect(this.refresh);
+        api.unwatchCurrentId(this.refresh);
+        api.unwatchSelect(this.refresh);
     }
 
     async refresh() {
-        let data = await api.getLastSelectedDoc();
-        if (!data) {
-            data = await api.getCurrentDoc();
-        }
+        const data = await api.getDocInView();
         this.setState({ data: data && Object.assign({}, data) || null });
     }
 
@@ -106,13 +103,13 @@ export default class DocDetailView extends React.Component<IProp, IState> {
         }
 
         const checkPass = (p: string) => {
-            if (!api.validatePassword(data, p)) {
+            const [ok, nd] = api.unsealPassword(data, p);
+            if (!ok) {
                 message.error('密码错误！');
-            } else {
-                api.unsealPassword(data, p);
-                data.password = undefined;
-                this.setState({ data });
+                return;
             }
+            nd.password = undefined;
+            this.setState({ data: nd });
         };
 
         return (<div>
@@ -124,6 +121,10 @@ export default class DocDetailView extends React.Component<IProp, IState> {
                 subTitle={data.description}
                 onBack={api.navUp}
                 tags={data.tags && data.tags.map<Tag>(name => <Tag>{name}</Tag> as any) || undefined}
+                extra={[
+                    <Button icon="edit" onClick={() => api.editDoc(data)}>编辑</Button>,
+                    <Button icon="delete" type="danger" onClick={api.removeSelectedDocs} >删除</Button>,
+                ]}
             />
             <Paragraph style={{ margin: '10px 50px' }}>
                 {data.password ? <PasswordForm onOk={checkPass} /> : <DocContent doc={data} />}

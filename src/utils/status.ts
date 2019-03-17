@@ -29,4 +29,5 @@ export function emit(name: string) {
 export const STATUS = {
     CURRENT_ID: 'Current Id',
     SELECTED_DOC_IDs: 'Selected Doc IDs',
+    EDITING_DOC_IDs: 'Editing Doc IDs',
 };

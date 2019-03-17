@@ -1,11 +1,12 @@
 import * as React from 'react';
-import * as store from '../store';
-import { IDoc } from '../store/Doc';
 import DocListView from './DocListView';
 import DocPath from './DocPath';
 import Toolbar from './Toolbar';
 import { Layout } from 'antd';
 import DocDetailView from './DocDetailView';
+import * as api from '../api';
+import { bindDeferThis } from '../utils';
+import DocEditorView from './DocEditorView';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -14,21 +15,32 @@ interface IProp extends React.Props<any> {
 }
 
 interface IState extends React.ComponentState {
-  list: IDoc[];
+  isEditingInView: boolean;
 }
 
 export class App extends React.Component<IProp, IState> {
   constructor(props: IProp) {
     super(props);
     this.state = {
-      list: [],
+      isEditingInView: false,
     };
+    bindDeferThis(this, 'refresh');
   }
 
-  async componentDidMount() {
-    const list = await store.children();
-    this.setState({ list });
+  componentDidMount() {
+    this.refresh();
+    api.watchEditing(this.refresh);
   }
+
+  componentWillUnmount() {
+    api.unwatchEditing(this.refresh);
+  }
+
+  async refresh() {
+    const isEditingInView = await api.isEditingInView();
+    this.setState({ isEditingInView });
+  }
+
 
   render() {
     return (<Layout>
@@ -44,7 +56,7 @@ export class App extends React.Component<IProp, IState> {
         </Sider>
         <Layout>
           <Content style={{ margin: '0px 10px 0px 10px', backgroundColor: 'white' }}>
-            <DocDetailView />
+            {this.state.isEditingInView ? <DocEditorView /> : <DocDetailView />}
           </Content>
           <Footer style={{ textAlign: 'center' }}>
             Ant Design ©2018 Created by Ant UED
