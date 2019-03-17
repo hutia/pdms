@@ -40,7 +40,6 @@ export default class Toolbar extends React.Component<IProp, IState> {
         return (<div onKeyDown={api.onKeyDown}>
             <Button icon="edit"
                 disabled={selectedDocIds.size !== 1}
-                onClick={api.editSelectedDoc}
             >
                 编辑
             </Button>
